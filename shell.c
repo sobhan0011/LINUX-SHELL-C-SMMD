@@ -244,58 +244,109 @@ void firstWordOfFile(const char* fileAddress) {
     fclose(ptr);
 }
 
-void mostRepeatedWordInFile(const char * fileAddress) {
+void mostRepeatedWordInFile(const char* fileAddress) {
+    FILE* ptr;
+    ptr = fopen(fileAddress, "r");
+    int word_count = 0;
+    int sw = 0;
+    if (NULL == ptr)
+    {
+        fprintf(stderr, "file can't be opened \n");
+        fclose(ptr);
+        return;
+    }
+    char* words[] = char* [5000];
+    char* word;
+    int word_counters[] = int[5000];
+    while (fscanf(f, " %s", word) == 1) {
+        sw = 0;
+        for (int j = 0; j < i; ++j) {
+            if (strcmp(word, words[i]) == 0)
+            {
+                sw = 1;
+                word_counters[i]++;
+            }
+        }
+        if (sw == 0)
+        {
+            word_count++;
+            strcpy(word, words[word_count]);
+        }
+    }
+    int max = word_counters[0];
+    int index = 0;
+    for (int i = 1; i < word_count; ++i) {
+        if (word_counters[i] > max)
+        {
+            max = word_counters;
+            index = i;
+        }
+    }
 
+    printf("%s", words[index]);
+
+    return;
 }
 
 void space_delete(const char* fileAddress) {
     FILE* ptr;
-    char ch;
-
     ptr = fopen(fileAddress, "r");
- 
     if (NULL == ptr)
-        printf("file can't be opened \n");
- 
+    {
+        fprintf(stderr, "file can't be opened \n");
+        fclose(ptr);
+        return;
+    }
+    char ch;
     do {
         ch = fgetc(ptr);
-        if (ch == ' ')
-            break;
-        printf(ch);
+        if (ch != ' ' && ch != '\t' && ch != '\n')
+            printf(ch);
     } while (ch != EOF);
- 
-    // Closing the file
     fclose(ptr);
 }
 
 void noneCommentLines(const char* fileAddress) {
     FILE* ptr;
-    char * line = NULL;
+    fp = fopen(fileAddress, "r");
+    char* line = NULL;
     size_t len = 0;
     ssize_t read;
     int sw = 0;
 
-    fp = fopen(fileAddress, "r");
-    if (fp == NULL)
-        printf("file can't be opened \n");
+    if (NULL == ptr)
+    {
+        fprintf(stderr, "file can't be opened \n");
+        fclose(ptr);
+        return;
+    }
 
     while ((read = getline(&line, &len, fp)) != -1) {
-       for (int i = 0; i < len && sw == 0; i++) {
-           if(line[i] != ' ')
-                sw = 1;
+       for (int i = 0; i < read && sw == 0; i++) {
+           if (line[i] != ' ')
+           {
+               sw = 1;
+               break;
+           }
        }
-       if(sw == 1 && line[i] != '#')
+       if (sw == 1 && line[i] != '#')
             printf("%s", line);
     }
 
     fclose(fp);
-    /* if (line)
-        free(line); */
+    return;
 }
 
 void numberOfLines(const char* fileAddress) {
     FILE* ptr;
-    char * line = NULL;
+    ptr = fopen(fileAddress, "r");
+    if (NULL == ptr)
+    {
+        fprintf(stderr, "file can't be opened \n");
+        fclose(ptr);
+        return;
+    }
+    char* line = NULL;
     size_t len = 0;
     ssize_t read;
     int i = 0;
@@ -306,6 +357,13 @@ void numberOfLines(const char* fileAddress) {
 
 void firstTenLines(const char* fileAddress) {
     FILE* ptr;
+    ptr = fopen(fileAddress, "r");
+    if (NULL == ptr)
+    {
+        fprintf(stderr, "file can't be opened \n");
+        fclose(ptr);
+        return;
+    }
     char * line = NULL;
     size_t len = 0;
     ssize_t read;
@@ -315,8 +373,8 @@ void firstTenLines(const char* fileAddress) {
 }
 
 int is_our_command(char** parsed) {
-    int NoOfOwnCmds = 10, i, switchOwnArg = 0;
-    char* ListOfOwnCmds[NoOfOwnCmds];
+    int no_of_own_cmds = 10, i, switchOwnArg = 0;
+    char* ListOfOwnCmds[no_of_own_cmds];
 
     ListOfOwnCmds[0] = "exit";
     ListOfOwnCmds[1] = "cd";
@@ -329,7 +387,7 @@ int is_our_command(char** parsed) {
     ListOfOwnCmds[8] = "nlf"; // Number of Lines in a File.
     ListOfOwnCmds[9] = "ftl"; // First Ten Lines.
 
-    for (i = 0; i < NoOfOwnCmds; i++) {
+    for (i = 0; i < no_of_own_cmds; i++) {
         if (strcmp(parsed[0], ListOfOwnCmds[i]) == 0) {
             switchOwnArg = i + 1;
             break;
