@@ -8,8 +8,8 @@
 #include<readline/readline.h>
 #include<readline/history.h>
 
-#define MAXCOM 1000 // max number of letters to be supported
-#define MAXLIST 100 // max number of commands to be supported
+#define MAX_COM 1000 // max number of letters to be supported
+#define MAX_LIST 100 // max number of commands to be supported
 
 // Clearing the shell using escape sequences
 #define clear() printf("\033[H\033[J")
@@ -53,8 +53,76 @@ void printDir()
 	printf("\nDir: %s", cwd);
 }
 
+// Function to execute builtin commands
+int ownCmdHandler(char** parsed)
+{
+    int NoOfOwnCmds = 10, i, switchOwnArg = 0;
+    char* ListOfOwnCmds[NoOfOwnCmds];
+    char* username;
+
+    ListOfOwnCmds[0] = "exit";
+    ListOfOwnCmds[1] = "cd";
+    ListOfOwnCmds[2] = "help";
+    ListOfOwnCmds[3] = "hello";
+    ListOfOwnCmds[4] = "fwf"; // First Word of a File.
+    ListOfOwnCmds[5] = "mr"; // Most Repeated word.
+    ListOfOwnCmds[6] = "sd"; // Space Delete.
+    ListOfOwnCmds[7] = "nc"; // None Comment.
+    ListOfOwnCmds[8] = "nlf"; // Number of Lines in a File.
+    ListOfOwnCmds[9] = "ftl"; // First Ten Lines.
+
+    for (i = 0; i < NoOfOwnCmds; i++) {
+        if (strcmp(parsed[0], ListOfOwnCmds[i]) == 0) {
+            switchOwnArg = i + 1;
+            break;
+        }
+    }
+
+    switch (switchOwnArg) {
+        case 1:
+            printf("\nGoodbye\n");
+            exit(0);
+        case 2:
+            chdir(parsed[1]);
+            return 1;
+        case 3:
+            openHelp();
+            return 1;
+        case 4:
+            username = getenv("USER");
+            printf("\nHello %s.\nMind that this is "
+                   "not a place to play around."
+                   "\nUse help to know more..\n",
+                   username);
+            return 1;
+        case 5:
+            firstWordOfFile(parsed[1]);
+            return 1;
+        case 6:
+            mostRepeatedWordOfFile(parsed[1]);
+            return 1;
+        case 7:
+            space_deleteOfFile(parsed[1]);
+            return 1;
+        case 8:
+            noneCommentLinesInFile(parsed[1]);
+            return 1;
+        case 9:
+            numberOfLinesInFile(parsed[1]);
+            return 1;
+        case 10:
+            firstTenLinesOfFile(parsed[1]);
+            return 1;
+        default:
+            break;
+    }
+
+    return 0;
+}
+
+
 // Function where the system command is executed
-void execArgs(char** parsed)
+void execArgs(char** parsed, int exec_flag)
 {
 	// Forking a child
 	pid_t pid = fork();
@@ -62,11 +130,15 @@ void execArgs(char** parsed)
 	if (pid == -1) {
 		printf("\nFailed forking child..");
 		return;
-	} else if (pid == 0) {
-		if (execvp(parsed[0], parsed) < 0) {
-			printf("\nCould not execute command..");
-		}
-		exit(0);
+	}
+	else if (pid == 0 && exec_flag == 0) {
+        ownCmdHandler(parsed);
+	}
+    else if (pid == 0) {
+    if (execvp(parsed[0], parsed) < 0) {
+        printf("\nCould not execute command..");
+    }
+    exit(0);
 	} else {
 		// waiting for child to terminate
 		wait(NULL);
@@ -176,7 +248,7 @@ void mostRepeatedWordInFile(const char * fileAddress) {
 
 }
 
-void spaceDelete(const char* fileAddress) {
+void space_delete(const char* fileAddress) {
     FILE* ptr;
     char ch;
 
@@ -242,72 +314,29 @@ void firstTenLines(const char* fileAddress) {
         printf("%s", line);
 }
 
-// Function to execute builtin commands
-int ownCmdHandler(char** parsed)
-{
-	int NoOfOwnCmds = 10, i, switchOwnArg = 0;
-	char* ListOfOwnCmds[NoOfOwnCmds];
-	char* username;
+int is_our_command(char** parsed) {
+    int NoOfOwnCmds = 10, i, switchOwnArg = 0;
+    char* ListOfOwnCmds[NoOfOwnCmds];
 
-	ListOfOwnCmds[0] = "exit";
-	ListOfOwnCmds[1] = "cd";
-	ListOfOwnCmds[2] = "help";
+    ListOfOwnCmds[0] = "exit";
+    ListOfOwnCmds[1] = "cd";
+    ListOfOwnCmds[2] = "help";
     ListOfOwnCmds[3] = "hello";
-	ListOfOwnCmds[4] = "fwf"; // First Word of a File.
+    ListOfOwnCmds[4] = "fwf"; // First Word of a File.
     ListOfOwnCmds[5] = "mr"; // Most Repeated word.
-	ListOfOwnCmds[6] = "sd"; // Space Delete.
-	ListOfOwnCmds[7] = "nc"; // None Comment.
-	ListOfOwnCmds[8] = "nlf"; // Number of Lines in a File.
+    ListOfOwnCmds[6] = "sd"; // Space Delete.
+    ListOfOwnCmds[7] = "nc"; // None Comment.
+    ListOfOwnCmds[8] = "nlf"; // Number of Lines in a File.
     ListOfOwnCmds[9] = "ftl"; // First Ten Lines.
 
-	for (i = 0; i < NoOfOwnCmds; i++) {
-		if (strcmp(parsed[0], ListOfOwnCmds[i]) == 0) {
-			switchOwnArg = i + 1;
-			break;
-		}
-	}
-
-	switch (switchOwnArg) {
-	case 1:
-		printf("\nGoodbye\n");
-		exit(0);
-	case 2:
-		chdir(parsed[1]);
-		return 1;
-	case 3:
-		openHelp();
-		return 1;
-	case 4:
-		username = getenv("USER");
-		printf("\nHello %s.\nMind that this is "
-			"not a place to play around."
-			"\nUse help to know more..\n",
-			username);
-		return 1;
-    case 5:
-        firstWordOfFile(parsed[1]);
-        return 1;
-    case 6:
-        mostRepeatedWordOfFile(parsed[1]);
-        return 1;
-    case 7:
-        spaceDeleteOfFile(parsed[1]);
-        return 1;
-    case 8:
-        noneCommentLinesInFile(parsed[1]);
-        return 1;
-    case 9:
-        numberOfLinesInFile(parsed[1]);
-        return 1;
-    case 10:
-        firstTenLinesOfFile(parsed[1]);
-        return 1;
-	default:
-		break;
-	}
-
-	return 0;
-}
+    for (i = 0; i < NoOfOwnCmds; i++) {
+        if (strcmp(parsed[0], ListOfOwnCmds[i]) == 0) {
+            switchOwnArg = i + 1;
+            break;
+        }
+    }
+    return switchOwnArg >= 1 ? 1 : 0;
+};
 
 // function for finding pipe
 int parsePipe(char* str, char** strpiped)
@@ -331,7 +360,7 @@ void parseSpace(char* str, char** parsed)
 {
 	int i;
 
-	for (i = 0; i < MAXLIST; i++) {
+	for (i = 0; i < MAX_LIST; i++) {
 		parsed[i] = strsep(&str, " ");
 
 		if (parsed[i] == NULL)
@@ -340,7 +369,6 @@ void parseSpace(char* str, char** parsed)
 			i--;
 	}
 }
-
 
 int processString(char* str, char** parsed, char** parsedpipe)
 {
@@ -356,7 +384,7 @@ int processString(char* str, char** parsed, char** parsedpipe)
     else
 		parseSpace(str, parsed);
 
-	if (ownCmdHandler(parsed))
+	if (is_our_command(parsed))
 		return 0;
 	else
 		return 1 + piped;
@@ -364,8 +392,8 @@ int processString(char* str, char** parsed, char** parsedpipe)
 
 int main()
 {
-	char inputString[MAXCOM], *parsedArgs[MAXLIST];
-	char* parsedArgsPiped[MAXLIST];
+	char inputString[MAX_COM], *parsedArgs[MAX_LIST];
+	char* parsedArgsPiped[MAX_LIST];
 	int execFlag = 0;
 	init_shell();
 
@@ -382,11 +410,10 @@ int main()
 		// 2 if it is including a pipe.
 
 		// execute
-		if (execFlag == 1)
-			execArgs(parsedArgs);
-
-		if (execFlag == 2)
-			execArgsPiped(parsedArgs, parsedArgsPiped);
+        if (execFlag == 2)
+            execArgsPiped(parsedArgs, parsedArgsPiped);
+        else
+			execArgs(parsedArgs, execFlag);
 	}
 	return 0;
 }
