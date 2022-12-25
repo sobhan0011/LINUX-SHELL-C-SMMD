@@ -124,6 +124,7 @@ int ownCmdHandler(char** parsed)
 // Function where the system command is executed
 void execArgs(char** parsed, int exec_flag)
 {
+	getPath();
 	// Forking a child
 	pid_t pid = fork();
 
@@ -370,6 +371,16 @@ void firstTenLines(const char* fileAddress) {
     int i = 0;
     while ((read = getline(&line, &len, fp)) != -1 && i++ < 10)
         printf("%s", line);
+}
+
+void getPath() {
+	 char cwd[PATH_MAX];
+   if (getcwd(cwd, sizeof(cwd)) != NULL) {
+       printf("Current working dir: %s\n", cwd);
+   } else {
+       perror("getcwd() error");
+       return 1;
+   }
 }
 
 int is_our_command(char** parsed) {
