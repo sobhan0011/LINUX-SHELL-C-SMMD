@@ -1,12 +1,13 @@
 // C Program to design a shell in Linux
-#include<stdio.h>
-#include<string.h>
-#include<stdlib.h>
-#include<unistd.h>
-#include<sys/types.h>
-#include<sys/wait.h>
-#include<readline/readline.h>
-#include<readline/history.h>
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/wait.h>
+#include <readline/readline.h>
+#include <readline/history.h>
+#include <linux/limits.h>
 
 #define MAX_COM 1000 // max number of letters to be supported
 #define MAX_LIST 100 // max number of commands to be supported
@@ -256,22 +257,22 @@ void mostRepeatedWordInFile(const char* fileAddress) {
         fclose(ptr);
         return;
     }
-    char* words[] = char* [5000];
+    char* words[5000];
     char* word;
-    int word_counters[] = int[5000];
-    while (fscanf(f, " %s", word) == 1) {
+    int word_counters[5000];
+    while (fscanf(ptr, " %s", word) == 1) {
         sw = 0;
-        for (int j = 0; j < i; ++j) {
-            if (strcmp(word, words[i]) == 0)
+        for (int j = 0; j < word_count; ++j) {
+            if (strcmp(word, words[word_count]) == 0)
             {
                 sw = 1;
-                word_counters[i]++;
+                word_counters[word_count]++;
             }
         }
         if (sw == 0)
         {
-            word_count++;
             strcpy(word, words[word_count]);
+            word_count++;
         }
     }
     int max = word_counters[0];
@@ -309,11 +310,12 @@ void space_delete(const char* fileAddress) {
 
 void noneCommentLines(const char* fileAddress) {
     FILE* ptr;
+    FILE *fp;
     fp = fopen(fileAddress, "r");
     char* line = NULL;
     size_t len = 0;
     ssize_t read;
-    int sw = 0;
+    int sw = 0, i = 0;
 
     if (NULL == ptr)
     {
@@ -323,7 +325,8 @@ void noneCommentLines(const char* fileAddress) {
     }
 
     while ((read = getline(&line, &len, fp)) != -1) {
-       for (int i = 0; i < read && sw == 0; i++) {
+    sw = 0;
+       for (i = 0; i < read && sw == 0; i++) {
            if (line[i] != ' ')
            {
                sw = 1;
@@ -351,7 +354,7 @@ void numberOfLines(const char* fileAddress) {
     size_t len = 0;
     ssize_t read;
     int i = 0;
-    while ((read = getline(&line, &len, fp)) != -1)
+    while ((read = getline(&line, &len, ptr)) != -1)
        i++;
     printf("%d", i);
 } 
@@ -369,7 +372,7 @@ void firstTenLines(const char* fileAddress) {
     size_t len = 0;
     ssize_t read;
     int i = 0;
-    while ((read = getline(&line, &len, fp)) != -1 && i++ < 10)
+    while ((read = getline(&line, &len, ptr)) != -1 && i++ < 10)
         printf("%s", line);
 }
 
