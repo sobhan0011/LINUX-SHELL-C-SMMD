@@ -38,7 +38,7 @@ void firstWordOfFile(const char* fileAddress) {
 
     } while (ch != EOF);
  
-    // Closing the file
+    
     fclose(ptr);
 }
 
@@ -82,7 +82,7 @@ void mostRepeatedWordInFile(const char* fileAddress) {
     }
 
     printf("%s", words[index]);
-
+	fclose(ptr);
     return;
 }
 
@@ -96,6 +96,7 @@ void space_delete(const char* fileAddress) {
         return;
     }
     
+    printf("Here is your file without any white spaces:/n");
     while ((read = getline(&line, &len, ptr)) != -1)
        for (i = 0; i < read && sw == 0; i++)
            if (line[i] != ' ' && line[i] != ' ' && line[i] != ' ')
@@ -119,6 +120,7 @@ void noneCommentLines(const char* fileAddress) {
         return;
     }
 
+	printf("Here are none comment lines of your file:/n");
     while ((read = getline(&line, &len, ptr)) != -1) {
     sw = 0;
        for (i = 0; i < read && sw == 0; i++) {
@@ -151,7 +153,9 @@ void numberOfLines(const char* fileAddress) {
     int i = 0;
     while ((read = getline(&line, &len, ptr)) != -1)
        i++;
-    printf("%d", i);
+    printf("Your file has %d line(s).", i);
+    fclose(ptr);
+    return;
 } 
 
 void firstTenLines(const char* fileAddress) {
@@ -167,8 +171,11 @@ void firstTenLines(const char* fileAddress) {
     size_t len = 0;
     ssize_t read;
     int i = 0;
+    printf("Here are first ten lines of your file:/n");
     while ((read = getline(&line, &len, ptr)) != -1 && i++ < 10)
         printf("%s", line);
+    fclose(ptr);
+    return;
 }
 
 void getPath() {
