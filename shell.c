@@ -38,50 +38,56 @@ void firstWordOfFile(const char* fileAddress) {
 
     } while (ch != EOF);
  
-    
     fclose(ptr);
 }
 
 void mostRepeatedWordInFile(const char* fileAddress) {
     FILE* ptr;
+    char* line = NULL;
+    size_t len = 0;
+    ssize_t read;
     ptr = fopen(fileAddress, "r");
-    int word_count = 0;
-    int sw = 0;
     if (NULL == ptr)
     {
         fprintf(stderr, "file can't be opened \n");
         fclose(ptr);
         return;
     }
-    char* words[5000];
-    char* word;
-    int word_counters[5000];
-    while (fscanf(ptr, "%s", word) == 1) {
-        sw = 0;
-        for (int j = 0; j < word_count; ++j) {
-            if (strcmp(word, words[word_count]) == 0)
-            {
-                sw = 1;
-                word_counters[word_count]++;
-            }
-        }
-        if (sw == 0)
-        {
-            strcpy(word, words[word_count]);
-            word_count++;
+    
+    char jomle[MAX_COM];
+    char* words[MAX_COM];
+    int word_counters[MAX_COM] = {0};
+    char* new_word;
+    int i;
+    printf("%Here is most repeated word in your file:\n")
+    while ((read = getline(&line, &len, ptr)) != -1) {
+    	i = 0;
+	    new_word = strtok(line, " ");
+	    while (new_word != NULL) {
+	        words[i] = new_word;
+	        i++;
+	        new_word = strtok(NULL, " ");
+	    }
+	    for (int j = 0; j < i; ++j) {
+	        for (int k = j + 1; k < i; ++k) {
+	            if (strcmp(words[j], words[k]) == 0) {
+	                word_counters[j] += 1;
+	            }
+	        }
+	    }
+    }
+    
+    
+    int max = 0;
+    int index;
+    for (int j = 0; j < i; ++j) {
+        if (max < word_counters[j]) {
+            max = word_counters[j];
+            index = j;
         }
     }
-    int max = word_counters[0];
-    int index = 0;
-    for (int i = 1; i < word_count; ++i) {
-        if (word_counters[i] > max)
-        {
-            max = word_counters[i];
-            index = i;
-        }
-    }
-
     printf("%s", words[index]);
+
 	fclose(ptr);
     return;
 }
@@ -98,11 +104,11 @@ void space_delete(const char* fileAddress) {
     
     printf("Here is your file without any white spaces:/n");
     while ((read = getline(&line, &len, ptr)) != -1)
-       for (i = 0; i < read && sw == 0; i++)
-           if (line[i] != ' ' && line[i] != ' ' && line[i] != ' ')
+       for (i = 0; i < read; i++)
+           if (line[i] != ' ' && line[i] != '/n' && line[i] != '/t')
 		   		printf("%c", line[i]);
-    
     fclose(ptr);
+    return;
 }
 
 void noneCommentLines(const char* fileAddress) {
