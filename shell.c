@@ -56,7 +56,7 @@ void mostRepeatedWordInFile(const char* fileAddress) {
     char* words[5000];
     char* word;
     int word_counters[5000];
-    while (fscanf(ptr, " %s", word) == 1) {
+    while (fscanf(ptr, "%s", word) == 1) {
         sw = 0;
         for (int j = 0; j < word_count; ++j) {
             if (strcmp(word, words[word_count]) == 0)
@@ -95,19 +95,18 @@ void space_delete(const char* fileAddress) {
         fclose(ptr);
         return;
     }
-    char ch;
-    do {
-        ch = fgetc(ptr);
-        if (ch != ' ' && ch != '\t' && ch != '\n')
-            printf("%c", ch);
-    } while (ch != EOF);
+    
+    while ((read = getline(&line, &len, ptr)) != -1)
+       for (i = 0; i < read && sw == 0; i++)
+           if (line[i] != ' ' && line[i] != ' ' && line[i] != ' ')
+		   		printf("%c", line[i]);
+    
     fclose(ptr);
 }
 
 void noneCommentLines(const char* fileAddress) {
     FILE* ptr;
-    FILE *fp;
-    fp = fopen(fileAddress, "r");
+    ptr = fopen(fileAddress, "r");
     char* line = NULL;
     size_t len = 0;
     ssize_t read;
@@ -120,7 +119,7 @@ void noneCommentLines(const char* fileAddress) {
         return;
     }
 
-    while ((read = getline(&line, &len, fp)) != -1) {
+    while ((read = getline(&line, &len, ptr)) != -1) {
     sw = 0;
        for (i = 0; i < read && sw == 0; i++) {
            if (line[i] != ' ')
@@ -133,7 +132,7 @@ void noneCommentLines(const char* fileAddress) {
             printf("%s", line);
     }
 
-    fclose(fp);
+    fclose(ptr);
     return;
 }
 
