@@ -95,6 +95,10 @@ void mostRepeatedWordInFile(const char* fileAddress) {
 void space_delete(const char* fileAddress) {
     FILE* ptr;
     ptr = fopen(fileAddress, "r");
+    char* line = NULL;
+    size_t len = 0;
+    ssize_t read;
+    int i = 0;
     if (NULL == ptr)
     {
         fprintf(stderr, "file can't be opened \n");
@@ -102,10 +106,10 @@ void space_delete(const char* fileAddress) {
         return;
     }
     
-    printf("Here is your file without any white spaces:/n");
+    printf("Here is your file without any white spaces:\n");
     while ((read = getline(&line, &len, ptr)) != -1)
        for (i = 0; i < read; i++)
-           if (line[i] != ' ' && line[i] != '/n' && line[i] != '/t')
+           if (line[i] != ' ' && line[i] != '\n' && line[i] != '\t')
 		   		printf("%c", line[i]);
     fclose(ptr);
     return;
