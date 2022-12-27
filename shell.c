@@ -15,6 +15,190 @@
 // Clearing the shell using escape sequences
 #define clear() printf("\033[H\033[J")
 
+// Functions:
+void firstWordOfFile(const char* fileAddress) {
+    FILE* ptr;
+    char ch;
+    int sw = 0;
+ 
+    ptr = fopen(fileAddress, "r");
+ 
+    if (NULL == ptr)
+        printf("file can't be opened \n");
+ 
+    do {
+        ch = fgetc(ptr);
+        if(ch != ' ') {
+            sw = 1; // If the file starts with spaces.
+        }
+        if (sw == 1 && ch == ' ')
+            break;
+        
+        printf("%c", ch);
+
+    } while (ch != EOF);
+ 
+    // Closing the file
+    fclose(ptr);
+}
+
+void mostRepeatedWordInFile(const char* fileAddress) {
+    FILE* ptr;
+    ptr = fopen(fileAddress, "r");
+    int word_count = 0;
+    int sw = 0;
+    if (NULL == ptr)
+    {
+        fprintf(stderr, "file can't be opened \n");
+        fclose(ptr);
+        return;
+    }
+    char* words[5000];
+    char* word;
+    int word_counters[5000];
+    while (fscanf(ptr, " %s", word) == 1) {
+        sw = 0;
+        for (int j = 0; j < word_count; ++j) {
+            if (strcmp(word, words[word_count]) == 0)
+            {
+                sw = 1;
+                word_counters[word_count]++;
+            }
+        }
+        if (sw == 0)
+        {
+            strcpy(word, words[word_count]);
+            word_count++;
+        }
+    }
+    int max = word_counters[0];
+    int index = 0;
+    for (int i = 1; i < word_count; ++i) {
+        if (word_counters[i] > max)
+        {
+            max = word_counters[i];
+            index = i;
+        }
+    }
+
+    printf("%s", words[index]);
+
+    return;
+}
+
+void space_delete(const char* fileAddress) {
+    FILE* ptr;
+    ptr = fopen(fileAddress, "r");
+    if (NULL == ptr)
+    {
+        fprintf(stderr, "file can't be opened \n");
+        fclose(ptr);
+        return;
+    }
+    char ch;
+    do {
+        ch = fgetc(ptr);
+        if (ch != ' ' && ch != '\t' && ch != '\n')
+            printf("%c", ch);
+    } while (ch != EOF);
+    fclose(ptr);
+}
+
+void noneCommentLines(const char* fileAddress) {
+    FILE* ptr;
+    FILE *fp;
+    fp = fopen(fileAddress, "r");
+    char* line = NULL;
+    size_t len = 0;
+    ssize_t read;
+    int sw = 0, i = 0;
+
+    if (NULL == ptr)
+    {
+        fprintf(stderr, "file can't be opened \n");
+        fclose(ptr);
+        return;
+    }
+
+    while ((read = getline(&line, &len, fp)) != -1) {
+    sw = 0;
+       for (i = 0; i < read && sw == 0; i++) {
+           if (line[i] != ' ')
+           {
+               sw = 1;
+               break;
+           }
+       }
+       if (sw == 1 && line[i] != '#')
+            printf("%s", line);
+    }
+
+    fclose(fp);
+    return;
+}
+
+void numberOfLines(const char* fileAddress) {
+    FILE* ptr;
+    ptr = fopen(fileAddress, "r");
+    if (NULL == ptr)
+    {
+        fprintf(stderr, "file can't be opened \n");
+        fclose(ptr);
+        return;
+    }
+    char* line = NULL;
+    size_t len = 0;
+    ssize_t read;
+    int i = 0;
+    while ((read = getline(&line, &len, ptr)) != -1)
+       i++;
+    printf("%d", i);
+} 
+
+void firstTenLines(const char* fileAddress) {
+    FILE* ptr;
+    ptr = fopen(fileAddress, "r");
+    if (NULL == ptr)
+    {
+        fprintf(stderr, "file can't be opened \n");
+        fclose(ptr);
+        return;
+    }
+    char * line = NULL;
+    size_t len = 0;
+    ssize_t read;
+    int i = 0;
+    while ((read = getline(&line, &len, ptr)) != -1 && i++ < 10)
+        printf("%s", line);
+}
+
+void getPath() {
+   char cwd[PATH_MAX];
+   if (getcwd(cwd, sizeof(cwd)) != NULL) {
+       printf("Current working dir: %s\n", cwd);
+   } else {
+       perror("getcwd() error");
+   }
+}
+
+// Help command builtin
+void openHelp()
+{
+	puts("\n***WELCOME TO MY SHELL HELP***"
+		"\nCopyright @ Suprotik Dey"
+		"\n-Use the shell at your own risk..."
+		"\nList of Commands supported:"
+		"\n>cd"
+		"\n>ls"
+		"\n>exit"
+		"\n>all other general commands available in UNIX shell"
+		"\n>pipe handling"
+		"\n>improper space handling");
+
+	return;
+}
+
+
 // Greeting shell during startup
 void init_shell()
 {
@@ -100,19 +284,19 @@ int ownCmdHandler(char** parsed)
             firstWordOfFile(parsed[1]);
             return 1;
         case 6:
-            mostRepeatedWordOfFile(parsed[1]);
+            mostRepeatedWordInFile(parsed[1]);
             return 1;
         case 7:
-            space_deleteOfFile(parsed[1]);
+            space_delete(parsed[1]);
             return 1;
         case 8:
-            noneCommentLinesInFile(parsed[1]);
+            noneCommentLines(parsed[1]);
             return 1;
         case 9:
-            numberOfLinesInFile(parsed[1]);
+            numberOfLines(parsed[1]);
             return 1;
         case 10:
-            firstTenLinesOfFile(parsed[1]);
+            firstTenLines(parsed[1]);
             return 1;
         default:
             break;
@@ -201,189 +385,6 @@ void execArgsPiped(char** parsed, char** parsedpipe)
 			wait(NULL);
 		}
 	}
-}
-
-// Help command builtin
-void openHelp()
-{
-	puts("\n***WELCOME TO MY SHELL HELP***"
-		"\nCopyright @ Suprotik Dey"
-		"\n-Use the shell at your own risk..."
-		"\nList of Commands supported:"
-		"\n>cd"
-		"\n>ls"
-		"\n>exit"
-		"\n>all other general commands available in UNIX shell"
-		"\n>pipe handling"
-		"\n>improper space handling");
-
-	return;
-}
-
-void firstWordOfFile(const char* fileAddress) {
-    FILE* ptr;
-    char ch;
-    int sw = 0;
- 
-    ptr = fopen(fileAddress, "r");
- 
-    if (NULL == ptr)
-        printf("file can't be opened \n");
- 
-    do {
-        ch = fgetc(ptr);
-        if(ch != ' ') {
-            sw = 1; // If the file starts with spaces.
-        }
-        if (sw == 1 && ch == ' ')
-            break;
-        
-        printf(ch);
-
-    } while (ch != EOF);
- 
-    // Closing the file
-    fclose(ptr);
-}
-
-void mostRepeatedWordInFile(const char* fileAddress) {
-    FILE* ptr;
-    ptr = fopen(fileAddress, "r");
-    int word_count = 0;
-    int sw = 0;
-    if (NULL == ptr)
-    {
-        fprintf(stderr, "file can't be opened \n");
-        fclose(ptr);
-        return;
-    }
-    char* words[5000];
-    char* word;
-    int word_counters[5000];
-    while (fscanf(ptr, " %s", word) == 1) {
-        sw = 0;
-        for (int j = 0; j < word_count; ++j) {
-            if (strcmp(word, words[word_count]) == 0)
-            {
-                sw = 1;
-                word_counters[word_count]++;
-            }
-        }
-        if (sw == 0)
-        {
-            strcpy(word, words[word_count]);
-            word_count++;
-        }
-    }
-    int max = word_counters[0];
-    int index = 0;
-    for (int i = 1; i < word_count; ++i) {
-        if (word_counters[i] > max)
-        {
-            max = word_counters;
-            index = i;
-        }
-    }
-
-    printf("%s", words[index]);
-
-    return;
-}
-
-void space_delete(const char* fileAddress) {
-    FILE* ptr;
-    ptr = fopen(fileAddress, "r");
-    if (NULL == ptr)
-    {
-        fprintf(stderr, "file can't be opened \n");
-        fclose(ptr);
-        return;
-    }
-    char ch;
-    do {
-        ch = fgetc(ptr);
-        if (ch != ' ' && ch != '\t' && ch != '\n')
-            printf(ch);
-    } while (ch != EOF);
-    fclose(ptr);
-}
-
-void noneCommentLines(const char* fileAddress) {
-    FILE* ptr;
-    FILE *fp;
-    fp = fopen(fileAddress, "r");
-    char* line = NULL;
-    size_t len = 0;
-    ssize_t read;
-    int sw = 0, i = 0;
-
-    if (NULL == ptr)
-    {
-        fprintf(stderr, "file can't be opened \n");
-        fclose(ptr);
-        return;
-    }
-
-    while ((read = getline(&line, &len, fp)) != -1) {
-    sw = 0;
-       for (i = 0; i < read && sw == 0; i++) {
-           if (line[i] != ' ')
-           {
-               sw = 1;
-               break;
-           }
-       }
-       if (sw == 1 && line[i] != '#')
-            printf("%s", line);
-    }
-
-    fclose(fp);
-    return;
-}
-
-void numberOfLines(const char* fileAddress) {
-    FILE* ptr;
-    ptr = fopen(fileAddress, "r");
-    if (NULL == ptr)
-    {
-        fprintf(stderr, "file can't be opened \n");
-        fclose(ptr);
-        return;
-    }
-    char* line = NULL;
-    size_t len = 0;
-    ssize_t read;
-    int i = 0;
-    while ((read = getline(&line, &len, ptr)) != -1)
-       i++;
-    printf("%d", i);
-} 
-
-void firstTenLines(const char* fileAddress) {
-    FILE* ptr;
-    ptr = fopen(fileAddress, "r");
-    if (NULL == ptr)
-    {
-        fprintf(stderr, "file can't be opened \n");
-        fclose(ptr);
-        return;
-    }
-    char * line = NULL;
-    size_t len = 0;
-    ssize_t read;
-    int i = 0;
-    while ((read = getline(&line, &len, ptr)) != -1 && i++ < 10)
-        printf("%s", line);
-}
-
-void getPath() {
-	 char cwd[PATH_MAX];
-   if (getcwd(cwd, sizeof(cwd)) != NULL) {
-       printf("Current working dir: %s\n", cwd);
-   } else {
-       perror("getcwd() error");
-       return 1;
-   }
 }
 
 int is_our_command(char** parsed) {
