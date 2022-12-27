@@ -24,8 +24,12 @@ void firstWordOfFile(const char* fileAddress) {
     ptr = fopen(fileAddress, "r");
  
     if (NULL == ptr)
-        printf("file can't be opened \n");
- 
+    {
+    	fprintf(stderr, "file can't be opened \n");
+        fclose(ptr);
+        return;
+	}
+ 	printf("Here is the first word in your file:\n");
     do {
         ch = fgetc(ptr);
         if(ch != ' ') {
@@ -59,7 +63,7 @@ void mostRepeatedWordInFile(const char* fileAddress) {
     int word_counters[MAX_COM] = {0};
     char* new_word;
     int i;
-    printf("%Here is most repeated word in your file:\n")
+    printf("Here is most repeated word in your file:\n");
     while ((read = getline(&line, &len, ptr)) != -1) {
     	i = 0;
 	    new_word = strtok(line, " ");
@@ -481,6 +485,7 @@ int processString(char* str, char** parsed, char** parsedpipe)
 
 int main()
 {
+	printf("wth");
 	char inputString[MAX_COM], *parsedArgs[MAX_LIST];
 	char* parsedArgsPiped[MAX_LIST];
 	int execFlag = 0;
