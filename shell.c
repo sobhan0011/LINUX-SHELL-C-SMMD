@@ -16,12 +16,15 @@
 #define clear() printf("\033[H\033[J")
 
 // Functions:
-void firstWordOfFile(const char* fileAddress) {
+void first_segment_of_lines_of_file(const char* file_address) {
     FILE* ptr;
+    char* line = NULL;
+    size_t len = 0;
+    ssize_t read;
     char ch;
     int sw = 0;
  
-    ptr = fopen(fileAddress, "r");
+    ptr = fopen(file_address, "r");
  
     if (NULL == ptr)
     {
@@ -29,36 +32,41 @@ void firstWordOfFile(const char* fileAddress) {
         fclose(ptr);
         return;
 	}
- 	printf("Here is the first word in your file:\n");
-    do {
-        ch = fgetc(ptr);
-        if(ch != ' ') {
-            sw = 1; // If the file starts with spaces.
-        }
-        if (sw == 1 && ch == ' ')
-            break;
-        
-        printf("%c", ch);
+ 	printf("Here are the first segment of lines in your file:\n");
 
-    } while (ch != EOF);
- 
+    while ((read = getline(&line, &len, ptr)) != -1) {
+        sw = 0;
+        for (int i = 0; i < read; i++) {
+            ch = line[i];
+            if (ch != ' ')
+                sw = 1; // If the file starts with spaces.
+
+            if (sw == 1 && ch == ' ')
+                break;
+
+            if (sw == 0)
+                continue;
+
+            printf("%c", ch);
+        }
+        printf("\n");
+    }
     fclose(ptr);
 }
 
-void mostRepeatedWordInFile(const char* fileAddress) {
+void most_repeated_word_in_file(const char* file_address) {
     FILE* ptr;
     char* line = NULL;
     size_t len = 0;
     ssize_t read;
-    ptr = fopen(fileAddress, "r");
+    ptr = fopen(file_address, "r");
     if (NULL == ptr)
     {
-        fprintf(stderr, "file can't be opened \n");
+        fprintf(stderr, "file can't be opened\n");
         fclose(ptr);
         return;
     }
-    
-    char jomle[MAX_COM];
+
     char* words[MAX_COM];
     int word_counters[MAX_COM] = {0};
     char* new_word;
@@ -72,16 +80,13 @@ void mostRepeatedWordInFile(const char* fileAddress) {
 	        i++;
 	        new_word = strtok(NULL, " ");
 	    }
-	    for (int j = 0; j < i; ++j) {
-	        for (int k = j + 1; k < i; ++k) {
-	            if (strcmp(words[j], words[k]) == 0) {
+
+	    for (int j = 0; j < i; ++j)
+	        for (int k = j + 1; k < i; ++k)
+	            if (strcmp(words[j], words[k]) == 0)
 	                word_counters[j] += 1;
-	            }
-	        }
-	    }
     }
-    
-    
+
     int max = 0;
     int index;
     for (int j = 0; j < i; ++j) {
@@ -93,12 +98,11 @@ void mostRepeatedWordInFile(const char* fileAddress) {
     printf("%s", words[index]);
 
 	fclose(ptr);
-    return;
 }
 
-void space_delete(const char* fileAddress) {
+void space_delete(const char* file_address) {
     FILE* ptr;
-    ptr = fopen(fileAddress, "r");
+    ptr = fopen(file_address, "r");
     char* line = NULL;
     size_t len = 0;
     ssize_t read;
@@ -116,12 +120,11 @@ void space_delete(const char* fileAddress) {
            if (line[i] != ' ' && line[i] != '\n' && line[i] != '\t')
 		   		printf("%c", line[i]);
     fclose(ptr);
-    return;
 }
 
-void noneCommentLines(const char* fileAddress) {
+void none_comment_lines(const char* file_address) {
     FILE* ptr;
-    ptr = fopen(fileAddress, "r");
+    ptr = fopen(file_address, "r");
     char* line = NULL;
     size_t len = 0;
     ssize_t read;
@@ -149,12 +152,11 @@ void noneCommentLines(const char* fileAddress) {
     }
 
     fclose(ptr);
-    return;
 }
 
-void numberOfLines(const char* fileAddress) {
+void number_of_lines_of_file(const char* file_address) {
     FILE* ptr;
-    ptr = fopen(fileAddress, "r");
+    ptr = fopen(file_address, "r");
     if (NULL == ptr)
     {
         fprintf(stderr, "file can't be opened \n");
@@ -169,19 +171,18 @@ void numberOfLines(const char* fileAddress) {
        i++;
     printf("Your file has %d line(s).", i);
     fclose(ptr);
-    return;
 } 
 
-void firstTenLines(const char* fileAddress) {
+void first_ten_lines_of_file(const char* file_address) {
     FILE* ptr;
-    ptr = fopen(fileAddress, "r");
+    ptr = fopen(file_address, "r");
     if (NULL == ptr)
     {
         fprintf(stderr, "file can't be opened \n");
         fclose(ptr);
         return;
     }
-    char * line = NULL;
+    char* line = NULL;
     size_t len = 0;
     ssize_t read;
     int i = 0;
@@ -189,10 +190,9 @@ void firstTenLines(const char* fileAddress) {
     while ((read = getline(&line, &len, ptr)) != -1 && i++ < 10)
         printf("%s", line);
     fclose(ptr);
-    return;
 }
 
-void getPath() {
+void get_path() {
    char cwd[PATH_MAX];
    if (getcwd(cwd, sizeof(cwd)) != NULL) {
        printf("Current working dir: %s\n", cwd);
@@ -202,7 +202,7 @@ void getPath() {
 }
 
 // Help command builtin
-void openHelp()
+void open_help()
 {
 	puts("\n***WELCOME TO MY SHELL HELP***"
 		"\nCopyright @ Suprotik Dey"
@@ -214,10 +214,8 @@ void openHelp()
 		"\n>all other general commands available in UNIX shell"
 		"\n>pipe handling"
 		"\n>improper space handling");
-
 	return;
 }
-
 
 // Greeting shell during startup
 void init_shell()
@@ -229,15 +227,15 @@ void init_shell()
 	printf("\n\n\t-USE AT YOUR OWN RISK-");
 	printf("\n\n\n\n*******************"
 		"***********************");
-	char* username = getenv("USER");
-	printf("\n\n\nUSER is: @%s", username);
+	char* user_name = getenv("USER");
+	printf("\n\n\nUSER is: @%s", user_name);
 	printf("\n");
 	sleep(1);
 	clear();
 }
 
 // Function to take input
-int takeInput(char* str)
+int take_input(char* str)
 {
 	char* buf;
 	buf = readline("\n>>> ");
@@ -251,7 +249,7 @@ int takeInput(char* str)
 }
 
 // Function to print Current Directory.
-void printDir()
+void print_directory()
 {
 	char cwd[1024];
 	getcwd(cwd, sizeof(cwd));
@@ -259,31 +257,32 @@ void printDir()
 }
 
 // Function to execute builtin commands
-int ownCmdHandler(char** parsed)
+int our_command_handler(char** parsed)
 {
-    int NoOfOwnCmds = 10, i, switchOwnArg = 0;
-    char* ListOfOwnCmds[NoOfOwnCmds];
-    char* username;
+    int number_of_own_commands = 10, i, switch_our_arg = 0;
+    char* list_of_our_commands[number_of_own_commands];
+    char* user_name;
 
-    ListOfOwnCmds[0] = "exit";
-    ListOfOwnCmds[1] = "cd";
-    ListOfOwnCmds[2] = "help";
-    ListOfOwnCmds[3] = "hello";
-    ListOfOwnCmds[4] = "fwf"; // First Word of a File.
-    ListOfOwnCmds[5] = "mr"; // Most Repeated word.
-    ListOfOwnCmds[6] = "sd"; // Space Delete.
-    ListOfOwnCmds[7] = "nc"; // None Comment.
-    ListOfOwnCmds[8] = "nlf"; // Number of Lines in a File.
-    ListOfOwnCmds[9] = "ftl"; // First Ten Lines.
+    list_of_our_commands[0] = "exit";
+    list_of_our_commands[1] = "cd";
+    list_of_our_commands[2] = "help";
+    list_of_our_commands[3] = "hello";
+    list_of_our_commands[4] = "fwf"; // First Word of a File.
+    list_of_our_commands[5] = "mr"; // Most Repeated word.
+    list_of_our_commands[6] = "sd"; // Space Delete.
+    list_of_our_commands[7] = "nc"; // None Comment.
+    list_of_our_commands[8] = "nlf"; // Number of Lines in a File.
+    list_of_our_commands[9] = "ftl"; // First Ten Lines.
 
-    for (i = 0; i < NoOfOwnCmds; i++) {
-        if (strcmp(parsed[0], ListOfOwnCmds[i]) == 0) {
-            switchOwnArg = i + 1;
+
+    for (i = 0; i < number_of_own_commands; i++) {
+        if (strcmp(parsed[0], list_of_our_commands[i]) == 0) {
+            switch_our_arg = i + 1;
             break;
         }
     }
 
-    switch (switchOwnArg) {
+    switch (switch_our_arg) {
         case 1:
             printf("\nGoodbye\n");
             exit(0);
@@ -291,32 +290,32 @@ int ownCmdHandler(char** parsed)
             chdir(parsed[1]);
             return 1;
         case 3:
-            openHelp();
+            open_help();
             return 1;
         case 4:
-            username = getenv("USER");
+            user_name = getenv("USER");
             printf("\nHello %s.\nMind that this is "
                    "not a place to play around."
                    "\nUse help to know more..\n",
-                   username);
+                   user_name);
             return 1;
         case 5:
-            firstWordOfFile(parsed[1]);
+            first_segment_of_lines_of_file(parsed[1]);
             return 1;
         case 6:
-            mostRepeatedWordInFile(parsed[1]);
+            most_repeated_word_in_file(parsed[1]);
             return 1;
         case 7:
             space_delete(parsed[1]);
             return 1;
         case 8:
-            noneCommentLines(parsed[1]);
+            none_comment_lines(parsed[1]);
             return 1;
         case 9:
-            numberOfLines(parsed[1]);
+            number_of_lines_of_file(parsed[1]);
             return 1;
         case 10:
-            firstTenLines(parsed[1]);
+            first_ten_lines_of_file(parsed[1]);
             return 1;
         default:
             break;
@@ -325,11 +324,10 @@ int ownCmdHandler(char** parsed)
     return 0;
 }
 
-
 // Function where the system command is executed
-void execArgs(char** parsed, int exec_flag)
+void exec_args(char** parsed, int exec_flag)
 {
-	getPath();
+    get_path();
 	// Forking a child
 	pid_t pid = fork();
 
@@ -338,7 +336,7 @@ void execArgs(char** parsed, int exec_flag)
 		return;
 	}
 	else if (pid == 0 && exec_flag == 0) {
-        ownCmdHandler(parsed);
+        our_command_handler(parsed);
 	}
     else if (pid == 0) {
     if (execvp(parsed[0], parsed) < 0) {
@@ -353,13 +351,13 @@ void execArgs(char** parsed, int exec_flag)
 }
 
 // Function where the piped system commands is executed
-void execArgsPiped(char** parsed, char** parsedpipe)
+void exec_args_piped(char** parsed, char** parsed_pipe)
 {
 	// 0 is read end, 1 is write end
-	int pipefd[2];
+	int pipe_function[2];
 	pid_t p1, p2;
 
-	if (pipe(pipefd) < 0) {
+	if (pipe(pipe_function) < 0) {
 		printf("\nPipe could not be initialized");
 		return;
 	}
@@ -372,9 +370,9 @@ void execArgsPiped(char** parsed, char** parsedpipe)
 	if (p1 == 0) {
 		// Child 1 executing..
 		// It only needs to write at the write end
-		close(pipefd[0]);
-		dup2(pipefd[1], STDOUT_FILENO);
-		close(pipefd[1]);
+		close(pipe_function[0]);
+		dup2(pipe_function[1], STDOUT_FILENO);
+		close(pipe_function[1]);
 
 		if (execvp(parsed[0], parsed) < 0) {
 			printf("\nCould not execute command 1..");
@@ -392,10 +390,10 @@ void execArgsPiped(char** parsed, char** parsedpipe)
 		// Child 2 executing..
 		// It only needs to read at the read end
 		if (p2 == 0) {
-			close(pipefd[1]);
-			dup2(pipefd[0], STDIN_FILENO);
-			close(pipefd[0]);
-			if (execvp(parsedpipe[0], parsedpipe) < 0) {
+			close(pipe_function[1]);
+			dup2(pipe_function[0], STDIN_FILENO);
+			close(pipe_function[0]);
+			if (execvp(parsed_pipe[0], parsed_pipe) < 0) {
 				printf("\nCould not execute command 2..");
 				exit(0);
 			}
@@ -408,74 +406,71 @@ void execArgsPiped(char** parsed, char** parsedpipe)
 }
 
 int is_our_command(char** parsed) {
-    int no_of_own_cmds = 10, i, switchOwnArg = 0;
-    char* ListOfOwnCmds[no_of_own_cmds];
+    int number_of_own_commands = 10, i, switch_our_arg = 0;
+    char* list_of_our_commands[number_of_own_commands];
 
-    ListOfOwnCmds[0] = "exit";
-    ListOfOwnCmds[1] = "cd";
-    ListOfOwnCmds[2] = "help";
-    ListOfOwnCmds[3] = "hello";
-    ListOfOwnCmds[4] = "fwf"; // First Word of a File.
-    ListOfOwnCmds[5] = "mr"; // Most Repeated word.
-    ListOfOwnCmds[6] = "sd"; // Space Delete.
-    ListOfOwnCmds[7] = "nc"; // None Comment.
-    ListOfOwnCmds[8] = "nlf"; // Number of Lines in a File.
-    ListOfOwnCmds[9] = "ftl"; // First Ten Lines.
+    list_of_our_commands[0] = "exit";
+    list_of_our_commands[1] = "cd";
+    list_of_our_commands[2] = "help";
+    list_of_our_commands[3] = "hello";
+    list_of_our_commands[4] = "fwf"; // First Word of a File.
+    list_of_our_commands[5] = "mr"; // Most Repeated word.
+    list_of_our_commands[6] = "sd"; // Space Delete.
+    list_of_our_commands[7] = "nc"; // None Comment.
+    list_of_our_commands[8] = "nlf"; // Number of Lines in a File.
+    list_of_our_commands[9] = "ftl"; // First Ten Lines.
 
-    for (i = 0; i < no_of_own_cmds; i++) {
-        if (strcmp(parsed[0], ListOfOwnCmds[i]) == 0) {
-            switchOwnArg = i + 1;
+    for (i = 0; i < number_of_own_commands; i++) {
+        if (strcmp(parsed[0], list_of_our_commands[i]) == 0) {
+            switch_our_arg = i + 1;
             break;
         }
     }
-    return switchOwnArg >= 1 ? 1 : 0;
-};
+    return switch_our_arg >= 1 ? 1 : 0;
+}
 
 // function for finding pipe
-int parsePipe(char* str, char** strpiped)
+int parse_pipe(char* str, char** str_piped)
 {
 	int i;
 	for (i = 0; i < 2; i++) {
-		strpiped[i] = strsep(&str, "|");
-		if (strpiped[i] == NULL)
+        str_piped[i] = strsep(&str, "|");
+		if (str_piped[i] == NULL)
 			break;
 	}
 
-	if (strpiped[1] == NULL)
+	if (str_piped[1] == NULL)
 		return 0; // returns zero if no pipe is found.
-	else {
+	else
 		return 1;
-	}
 }
 
 // function for parsing command words
-void parseSpace(char* str, char** parsed)
+void parse_space(char* str, char** parsed)
 {
-	int i;
-
-	for (i = 0; i < MAX_LIST; i++) {
+	for (int i = 0; i < MAX_LIST; i++) {
 		parsed[i] = strsep(&str, " ");
-
 		if (parsed[i] == NULL)
-			break;
+            return;
 		if (strlen(parsed[i]) == 0)
 			i--;
 	}
+    return;
 }
 
-int processString(char* str, char** parsed, char** parsedpipe)
+int processString(char* str, char** parsed, char** parsed_pipe)
 {
-	char* strpiped[2];
+	char* str_piped[2];
 	int piped = 0;
 
-	piped = parsePipe(str, strpiped);
+	piped = parse_pipe(str, str_piped);
 
 	if (piped) {
-		parseSpace(strpiped[0], parsed);
-		parseSpace(strpiped[1], parsedpipe);
+		parse_space(str_piped[0], parsed);
+        parse_space(str_piped[1], parsed_pipe);
 	} 
     else
-		parseSpace(str, parsed);
+        parse_space(str, parsed);
 
 	if (is_our_command(parsed))
 		return 0;
@@ -485,29 +480,28 @@ int processString(char* str, char** parsed, char** parsedpipe)
 
 int main()
 {
-	printf("wth");
-	char inputString[MAX_COM], *parsedArgs[MAX_LIST];
-	char* parsedArgsPiped[MAX_LIST];
-	int execFlag = 0;
+	char input_string[MAX_COM], *parsed_args[MAX_LIST];
+	char* parsed_args_piped[MAX_LIST];
+	int exec_flag = 0;
 	init_shell();
 
 	while (1) {
-		printDir();
+        print_directory();
 
-		if (takeInput(inputString))
+		if (take_input(input_string))
 			continue;
 
-		execFlag = processString(inputString, parsedArgs, parsedArgsPiped);
+        exec_flag = processString(input_string, parsed_args, parsed_args_piped);
 		// execflag returns zero if there is no command
 		// or it is a builtin command,
 		// 1 if it is a simple command
 		// 2 if it is including a pipe.
 
 		// execute
-        if (execFlag == 2)
-            execArgsPiped(parsedArgs, parsedArgsPiped);
+        if (exec_flag == 2)
+            exec_args_piped(parsed_args, parsed_args_piped);
         else
-			execArgs(parsedArgs, execFlag);
+			exec_args(parsed_args, exec_flag);
 	}
 	return 0;
 }
