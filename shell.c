@@ -79,8 +79,7 @@ void most_repeated_word_in_file(const char* file_address) {
     ssize_t read;
     char* words[MAX_COM];
     int word_counters[MAX_COM] = {0};
-    char* new_word;
-    int i = 0, sw, start_index, end_index, count = 0;
+    int sw, start_index, end_index, count = 0;
 
     if (NULL == ptr)
     {
@@ -101,7 +100,7 @@ void most_repeated_word_in_file(const char* file_address) {
                 sw = 1;
             } // If the file starts with spaces.
 
-            if (sw == 1 && (ch == ' ' || ch == '\t' ||  ch == '\n' || i == read))
+            if (sw == 1 && (ch == ' ' || ch == '\t' ||  ch == '\n' || i == read - 1))
             {
                 words[count] = substr(line, start_index, i);
                 count++;
@@ -110,14 +109,14 @@ void most_repeated_word_in_file(const char* file_address) {
         }
     }
 
-    for (int j = 0; j < i; ++j)
-        for (int k = j + 1; k < i; ++k)
+    for (int j = 0; j < count; j++)
+        for (int k = j + 1; k < count; k++)
             if (strcmp(words[j], words[k]) == 0)
                 word_counters[j] += 1;
 
     int max = 0;
     int index;
-    for (int j = 0; j < i; j++)
+    for (int j = 0; j < count; j++)
         if (max < word_counters[j]) {
             max = word_counters[j];
             index = j;
@@ -510,6 +509,12 @@ int processString(char* str, char** parsed, char** parsed_pipe)
         return 1 + piped;
 }
 
+
+
+
+
+
+
 int main()
 {
     char input_string[MAX_COM], *parsed_args[MAX_LIST];
@@ -522,7 +527,7 @@ int main()
 
         if (take_input(input_string))
             continue;
-
+        
         exec_flag = processString(input_string, parsed_args, parsed_args_piped);
         // execflag returns zero if there is no command
         // or it is a builtin command,
