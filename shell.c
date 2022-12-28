@@ -9,12 +9,11 @@
 #include <readline/history.h>
 #include <linux/limits.h>
 
-#define MAX_COM 1000 // max number of letters to be supported
-#define MAX_LIST 100 // max number of commands to be supported
+#define COMMAND_MAX_LENGTH 1000
+#define MAX_NUMBER_OF_COMMAND 100
 
 // Clearing the shell using escape sequences
 #define clear() printf("\033[H\033[J")
-
 
 void first_segment_of_lines_of_file(const char* file_address) {
     FILE* ptr;
@@ -76,8 +75,8 @@ void most_repeated_word_in_file(const char* file_address) {
     char* line = NULL;
     size_t len = 0;
     ssize_t read;
-    char* words[MAX_COM];
-    int word_counters[MAX_COM] = {0};
+    char* words[COMMAND_MAX_LENGTH];
+    int word_counters[COMMAND_MAX_LENGTH] = {0};
     char ch;
     int sw, start_index, end_index, count = 0;
 
@@ -219,18 +218,15 @@ void first_ten_lines_of_file(const char* file_address) {
 
 void get_path() {
     char cwd[PATH_MAX];
-    if (getcwd(cwd, sizeof(cwd)) != NULL) {
+    if (getcwd(cwd, sizeof(cwd)) != NULL)
         printf("Current working dir: %s\n", cwd);
-    } else {
-        perror("getcwd() error");
-    }
+    else
+        fprintf(stderr, "Problem in getcwd() error\n");
 }
 
-// Help command builtin
 void open_help()
 {
-    puts("\n***WELCOME TO MY SHELL HELP***"
-         "\nCopyright @ Suprotik Dey"
+    puts("\n***WELCOME TO SHELL HELP***"
          "\n-Use the shell at your own risk..."
          "\nList of Commands supported:"
          "\n>cd"
@@ -244,11 +240,10 @@ void open_help()
          "\n>ftl"
          "\n>all other general commands available in UNIX shell"
          "\n>pipe handling"
-         "\n>improper space handling");
+         /*"\n>improper space handling"*/);
     return;
 }
 
-// Greeting shell during startup
 void init_shell()
 {
     clear();
@@ -265,7 +260,6 @@ void init_shell()
     clear();
 }
 
-// Function to take input
 int take_input(char* str)
 {
     char* buf;
@@ -279,7 +273,6 @@ int take_input(char* str)
         return 1;
 }
 
-// Function to print Current Directory.
 void print_directory()
 {
     char cwd[1024];
@@ -287,7 +280,6 @@ void print_directory()
     printf("\nDir: %s", cwd);
 }
 
-// Function to execute builtin commands
 int our_command_handler(char** parsed)
 {
     int number_of_own_commands = 10, i, switch_our_arg = 0;
@@ -476,7 +468,7 @@ int parse_pipe(char* str, char** str_piped)
 // Parsing command words
 void parse_space(char* str, char** parsed)
 {
-    for (int i = 0; i < MAX_LIST; i++) {
+    for (int i = 0; i < MAX_NUMBER_OF_COMMAND; i++) {
         parsed[i] = strsep(&str, " ");
         if (parsed[i] == NULL)
             return;
@@ -528,8 +520,8 @@ void sigintHandler(int sig_num)
 
 int main()
 {
-    char input_string[MAX_COM], *parsed_args[MAX_LIST];
-    char* parsed_args_piped[MAX_LIST];
+    char input_string[COMMAND_MAX_LENGTH], *parsed_args[MAX_NUMBER_OF_COMMAND];
+    char* parsed_args_piped[MAX_NUMBER_OF_COMMAND];
     int exec_flag = 0;
     init_shell();
 
