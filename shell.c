@@ -519,12 +519,21 @@ void add_to_history_file(char* str) {
     fclose(ptr);
 }
 
+void sigintHandler(int sig_num)
+{
+    signal(SIGINT, sigintHandler);
+    printf("\n Cannot be terminated using Ctrl+C \n");
+    fflush(stdout);
+}
+
 int main()
 {
     char input_string[MAX_COM], *parsed_args[MAX_LIST];
     char* parsed_args_piped[MAX_LIST];
     int exec_flag = 0;
     init_shell();
+
+    signal(SIGINT, sigintHandler);
 
     while (1) {
         print_directory();
