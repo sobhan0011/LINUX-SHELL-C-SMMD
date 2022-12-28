@@ -11,3 +11,11 @@
 * nc: prints those lines which are not comments.
 * nlf: prints the number of lines in the file.
 * ftl: prints the first ten lines.
+* Searches through history of commands with up and down buttons.
+* Covers pipeline.
+* Errors are printed.
+* Commands are saved in history.txt
+* Ctrl + c does not terminate the terminal.
+* A new Process is forked with each command.
+* Prompt is updated with each command and returns the current directory address.
+* git address: https://github.com/sobhan0011/LINUX-SHELL-C-SMMD
