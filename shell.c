@@ -355,7 +355,7 @@ int our_command_handler(char** parsed)
     return 0;
 }
 
-// Function where the system command is executed
+// For command execution
 void exec_args(char** parsed, int exec_flag)
 {
     get_path();
@@ -363,7 +363,7 @@ void exec_args(char** parsed, int exec_flag)
     pid_t pid = fork();
 
     if (pid == -1) {
-        printf("\nFailed forking child..");
+        fprintf(stderr, "Failed forking child\n");
         return;
     }
     else if (pid == 0 && exec_flag == 0) {
@@ -371,7 +371,7 @@ void exec_args(char** parsed, int exec_flag)
     }
     else if (pid == 0) {
         if (execvp(parsed[0], parsed) < 0) {
-            printf("\nCould not execute command..");
+            fprintf(stderr, "Could not execute command\n");
         }
         exit(0);
     } else {
@@ -381,55 +381,53 @@ void exec_args(char** parsed, int exec_flag)
     }
 }
 
-// Function where the piped system commands is executed
+// For piped commands executing
 void exec_args_piped(char** parsed, char** parsed_pipe)
 {
-    // 0 is read end, 1 is write end
+    // 0 for read end
+    // 1 for write end
     int pipe_function[2];
     pid_t p1, p2;
 
     if (pipe(pipe_function) < 0) {
-        printf("\nPipe could not be initialized");
+        fprintf(stderr, "Pipe couldn't be initialized\n");
         return;
     }
     p1 = fork();
     if (p1 < 0) {
-        printf("\nCould not fork");
+        fprintf(stderr, "Couldn't fork\n");
         return;
     }
 
     if (p1 == 0) {
-        // Child 1 executing..
-        // It only needs to write at the write end
+        // Child 1 is executing and write at the write end
         close(pipe_function[0]);
         dup2(pipe_function[1], STDOUT_FILENO);
         close(pipe_function[1]);
 
         if (execvp(parsed[0], parsed) < 0) {
-            printf("\nCould not execute command 1..");
+            fprintf(stderr, "Couldn't execute command 1\n");
             exit(0);
         }
     } else {
-        // Parent executing
+        // Parent is executing
         p2 = fork();
-
         if (p2 < 0) {
-            printf("\nCould not fork");
+            fprintf(stderr, "Couldn't fork\n");
             return;
         }
 
-        // Child 2 executing..
-        // It only needs to read at the read end
+        /// Child 2 is executing and read from the read end
         if (p2 == 0) {
             close(pipe_function[1]);
             dup2(pipe_function[0], STDIN_FILENO);
             close(pipe_function[0]);
             if (execvp(parsed_pipe[0], parsed_pipe) < 0) {
-                printf("\nCould not execute command 2..");
+                fprintf(stderr, "Couldn't execute command 2\n");
                 exit(0);
             }
         } else {
-            // parent executing, waiting for two children
+            // parent is executing and waiting for two children
             wait(NULL);
             wait(NULL);
         }
@@ -460,11 +458,10 @@ int is_our_command(char** parsed) {
     return switch_our_arg >= 1 ? 1 : 0;
 }
 
-// function for finding pipe
+// Finding pipe
 int parse_pipe(char* str, char** str_piped)
 {
-    int i;
-    for (i = 0; i < 2; i++) {
+    for (int i = 0; i < 2; i++) {
         str_piped[i] = strsep(&str, "|");
         if (str_piped[i] == NULL)
             break;
@@ -476,7 +473,7 @@ int parse_pipe(char* str, char** str_piped)
         return 1;
 }
 
-// function for parsing command words
+// Parsing command words
 void parse_space(char* str, char** parsed)
 {
     for (int i = 0; i < MAX_LIST; i++) {
@@ -492,7 +489,7 @@ void parse_space(char* str, char** parsed)
 int processString(char* str, char** parsed, char** parsed_pipe)
 {
     char* str_piped[2];
-    int piped = 0;
+    int piped;
 
     piped = parse_pipe(str, str_piped);
 
@@ -509,6 +506,19 @@ int processString(char* str, char** parsed, char** parsed_pipe)
         return 1 + piped;
 }
 
+void add_to_history_file(char* str) {
+    FILE* ptr;
+    ptr = fopen("history.txt","a");
+    if (NULL == ptr)
+    {
+        fprintf(stderr, "file can't be opened \n");
+        fclose(ptr);
+        return;
+    }
+    fprintf(ptr, "%s", str);
+    fclose(fptr);
+}
+
 int main()
 {
     char input_string[MAX_COM], *parsed_args[MAX_LIST];
@@ -521,6 +531,8 @@ int main()
 
         if (take_input(input_string))
             continue;
+
+        add_to_history_file(input_string);
 
         exec_flag = processString(input_string, parsed_args, parsed_args_piped);
         // execflag returns zero if there is no command
