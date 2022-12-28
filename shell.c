@@ -1,4 +1,4 @@
-// C Program to design a shell in Linux
+// Linux Shell
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -15,7 +15,7 @@
 // Clearing the shell using escape sequences
 #define clear() printf("\033[H\033[J")
 
-// Functions:
+
 void first_segment_of_lines_of_file(const char* file_address) {
     FILE* ptr;
     char* line = NULL;
@@ -28,7 +28,7 @@ void first_segment_of_lines_of_file(const char* file_address) {
 
     if (NULL == ptr)
     {
-        fprintf(stderr, "file can't be opened \n");
+        fprintf(stderr, "file can't be opened. \n");
         fclose(ptr);
         return;
     }
@@ -54,8 +54,7 @@ void first_segment_of_lines_of_file(const char* file_address) {
     fclose(ptr);
 }
 
-// Following function extracts characters present in `src`
-// between `m` and `n` (excluding `n`)
+// Extracts characters present in `src` between `m` and `n` (excluding `n`)
 char* substr(const char *src, int m, int n)
 {
     // get the length of the destination string
@@ -84,7 +83,7 @@ void most_repeated_word_in_file(const char* file_address) {
 
     if (NULL == ptr)
     {
-        fprintf(stderr, "file can't be opened \n");
+        fprintf(stderr, "file can't be opened. \n");
         fclose(ptr);
         return;
     }
@@ -135,7 +134,7 @@ void space_delete(const char* file_address) {
     int i = 0;
     if (NULL == ptr)
     {
-        fprintf(stderr, "file can't be opened \n");
+        fprintf(stderr, "file can't be opened. \n");
         fclose(ptr);
         return;
     }
@@ -158,7 +157,7 @@ void none_comment_lines(const char* file_address) {
 
     if (NULL == ptr)
     {
-        fprintf(stderr, "file can't be opened \n");
+        fprintf(stderr, "file can't be opened. \n");
         fclose(ptr);
         return;
     }
@@ -185,7 +184,7 @@ void number_of_lines_of_file(const char* file_address) {
     ptr = fopen(file_address, "r");
     if (NULL == ptr)
     {
-        fprintf(stderr, "file can't be opened \n");
+        fprintf(stderr, "file can't be opened. \n");
         fclose(ptr);
         return;
     }
@@ -204,7 +203,7 @@ void first_ten_lines_of_file(const char* file_address) {
     ptr = fopen(file_address, "r");
     if (NULL == ptr)
     {
-        fprintf(stderr, "file can't be opened \n");
+        fprintf(stderr, "file can't be opened. \n");
         fclose(ptr);
         return;
     }
@@ -358,7 +357,7 @@ int our_command_handler(char** parsed)
 // For command execution
 void exec_args(char** parsed, int exec_flag)
 {
-    get_path();
+    //get_path();
     // Forking a child
     pid_t pid = fork();
 
@@ -371,7 +370,7 @@ void exec_args(char** parsed, int exec_flag)
     }
     else if (pid == 0) {
         if (execvp(parsed[0], parsed) < 0) {
-            fprintf(stderr, "Could not execute command\n");
+            fprintf(stderr, "Could not execute command.\n");
         }
         exit(0);
     } else {
@@ -384,6 +383,7 @@ void exec_args(char** parsed, int exec_flag)
 // For piped commands executing
 void exec_args_piped(char** parsed, char** parsed_pipe)
 {
+    //get_path();
     // 0 for read end
     // 1 for write end
     int pipe_function[2];
@@ -406,7 +406,7 @@ void exec_args_piped(char** parsed, char** parsed_pipe)
         close(pipe_function[1]);
 
         if (execvp(parsed[0], parsed) < 0) {
-            fprintf(stderr, "Couldn't execute command 1\n");
+            fprintf(stderr, "Couldn't execute command 1.\n");
             exit(0);
         }
     } else {
@@ -423,7 +423,7 @@ void exec_args_piped(char** parsed, char** parsed_pipe)
             dup2(pipe_function[0], STDIN_FILENO);
             close(pipe_function[0]);
             if (execvp(parsed_pipe[0], parsed_pipe) < 0) {
-                fprintf(stderr, "Couldn't execute command 2\n");
+                fprintf(stderr, "Couldn't execute command 2.\n");
                 exit(0);
             }
         } else {
@@ -511,12 +511,12 @@ void add_to_history_file(char* str) {
     ptr = fopen("history.txt","a");
     if (NULL == ptr)
     {
-        fprintf(stderr, "file can't be opened \n");
+        fprintf(stderr, "file can't be opened. \n");
         fclose(ptr);
         return;
     }
-    fprintf(ptr, "%s", str);
-    fclose(fptr);
+    fprintf(ptr, "%s\n", str);
+    fclose(ptr);
 }
 
 int main()
