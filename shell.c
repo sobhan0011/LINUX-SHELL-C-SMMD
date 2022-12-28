@@ -79,6 +79,7 @@ void most_repeated_word_in_file(const char* file_address) {
     ssize_t read;
     char* words[MAX_COM];
     int word_counters[MAX_COM] = {0};
+    char ch;
     int sw, start_index, end_index, count = 0;
 
     if (NULL == ptr)
@@ -109,8 +110,8 @@ void most_repeated_word_in_file(const char* file_address) {
         }
     }
 
-    for (int j = 0; j < count; j++)
-        for (int k = j + 1; k < count; k++)
+    for (int j = 0; j < count; ++j)
+        for (int k = j + 1; k < count; ++k)
             if (strcmp(words[j], words[k]) == 0)
                 word_counters[j] += 1;
 
@@ -254,8 +255,8 @@ void init_shell()
     clear();
     printf("\n\n\n\n******************"
            "************************");
-    printf("\n\n\n\t****MY SHELL****");
-    printf("\n\n\t-USE AT YOUR OWN RISK-");
+    printf("\n\n\n\t****LINUX SHELL****");
+    printf("\n\n\t-CREATED BY SOBHAN MAHMOODI AND MEHRSA DEHNAVI-");
     printf("\n\n\n\n*******************"
            "***********************");
     char* user_name = getenv("USER");
@@ -325,8 +326,7 @@ int our_command_handler(char** parsed)
             return 1;
         case 4:
             user_name = getenv("USER");
-            printf("\nHello %s.\nMind that this is "
-                   "not a place to play around."
+            printf("\nHello %s.\n"
                    "\nUse help to know more..\n",
                    user_name);
             return 1;
@@ -508,7 +508,6 @@ int processString(char* str, char** parsed, char** parsed_pipe)
     else
         return 1 + piped;
 }
-
 
 int main()
 {
