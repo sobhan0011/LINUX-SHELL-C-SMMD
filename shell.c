@@ -510,11 +510,6 @@ int processString(char* str, char** parsed, char** parsed_pipe)
 }
 
 
-
-
-
-
-
 int main()
 {
     char input_string[MAX_COM], *parsed_args[MAX_LIST];
@@ -527,7 +522,7 @@ int main()
 
         if (take_input(input_string))
             continue;
-        
+
         exec_flag = processString(input_string, parsed_args, parsed_args_piped);
         // execflag returns zero if there is no command
         // or it is a builtin command,
