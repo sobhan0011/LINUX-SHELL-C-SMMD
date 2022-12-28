@@ -38,10 +38,10 @@ void first_segment_of_lines_of_file(const char* file_address) {
         sw = 0;
         for (int i = 0; i < read; i++) {
             ch = line[i];
-            if (ch != ' ')
+            if (ch != ' ' && ch != '\t' && ch != '\n')
                 sw = 1; // If the file starts with spaces.
 
-            if (sw == 1 && ch == ' ')
+            if (sw == 1 && (ch == ' ' || ch == '\t' ||  ch == '\n'))
                 break;
 
             if (sw == 0)
@@ -54,49 +54,75 @@ void first_segment_of_lines_of_file(const char* file_address) {
     fclose(ptr);
 }
 
+// Following function extracts characters present in `src`
+// between `m` and `n` (excluding `n`)
+char* substr(const char *src, int m, int n)
+{
+    // get the length of the destination string
+    int len = n - m;
+
+    // allocate (len + 1) chars for destination (+1 for extra null character)
+    char *dest = (char*)malloc(sizeof(char) * (len + 1));
+
+    // start with m'th char and copy `len` chars into the destination
+    strncpy(dest, (src + m), len);
+
+    // return the destination string
+    return dest;
+}
+
 void most_repeated_word_in_file(const char* file_address) {
     FILE* ptr;
+    ptr = fopen(file_address, "r");
     char* line = NULL;
     size_t len = 0;
     ssize_t read;
-    ptr = fopen(file_address, "r");
+    char* words[MAX_COM];
+    int word_counters[MAX_COM] = {0};
+    char* new_word;
+    int i = 0, sw, start_index, end_index, count = 0;
+
     if (NULL == ptr)
     {
-        fprintf(stderr, "file can't be opened\n");
+        fprintf(stderr, "file can't be opened \n");
         fclose(ptr);
         return;
     }
 
-    char* words[MAX_COM];
-    int word_counters[MAX_COM] = {0};
-    char* new_word;
-    int i;
     printf("Here is most repeated word in your file:\n");
     while ((read = getline(&line, &len, ptr)) != -1) {
-    	i = 0;
-	    new_word = strtok(line, " ");
-	    while (new_word != NULL) {
-	        words[i] = new_word;
-	        i++;
-	        new_word = strtok(NULL, " ");
-	    }
+        sw = 0;
+        for (int i = 0; i < read; i++) {
+            ch = line[i];
+            if (ch != ' ' && ch != '\t' && ch != '\n' && sw == 0)
+            {
+                start_index = i;
+                end_index = i;
+                sw = 1;
+            } // If the file starts with spaces.
 
-	    for (int j = 0; j < i; ++j)
-	        for (int k = j + 1; k < i; ++k)
-	            if (strcmp(words[j], words[k]) == 0)
-	                word_counters[j] += 1;
+            if (sw == 1 && (ch == ' ' || ch == '\t' ||  ch == '\n' || i == read))
+            {
+                words[count] = substr(line, start_index, i);
+                count++;
+                sw = 0;
+            }
+        }
     }
+
+    for (int j = 0; j < i; ++j)
+        for (int k = j + 1; k < i; ++k)
+            if (strcmp(words[j], words[k]) == 0)
+                word_counters[j] += 1;
 
     int max = 0;
     int index;
-    for (int j = 0; j < i; ++j) {
+    for (int j = 0; j < i; j++)
         if (max < word_counters[j]) {
             max = word_counters[j];
             index = j;
         }
-    }
     printf("%s", words[index]);
-
 	fclose(ptr);
 }
 
@@ -204,56 +230,62 @@ void get_path() {
 // Help command builtin
 void open_help()
 {
-	puts("\n***WELCOME TO MY SHELL HELP***"
-		"\nCopyright @ Suprotik Dey"
-		"\n-Use the shell at your own risk..."
-		"\nList of Commands supported:"
-		"\n>cd"
-		"\n>ls"
-		"\n>exit"
-		"\n>all other general commands available in UNIX shell"
-		"\n>pipe handling"
-		"\n>improper space handling");
-	return;
+    puts("\n***WELCOME TO MY SHELL HELP***"
+         "\nCopyright @ Suprotik Dey"
+         "\n-Use the shell at your own risk..."
+         "\nList of Commands supported:"
+         "\n>cd"
+         "\n>ls"
+         "\n>exit"
+         "\n>mr"
+         "\n>fwf"
+         "\n>sd"
+         "\n>nc"
+         "\n>nlf"
+         "\n>ftl"
+         "\n>all other general commands available in UNIX shell"
+         "\n>pipe handling"
+         "\n>improper space handling");
+    return;
 }
 
 // Greeting shell during startup
 void init_shell()
 {
-	clear();
-	printf("\n\n\n\n******************"
-		"************************");
-	printf("\n\n\n\t****MY SHELL****");
-	printf("\n\n\t-USE AT YOUR OWN RISK-");
-	printf("\n\n\n\n*******************"
-		"***********************");
-	char* user_name = getenv("USER");
-	printf("\n\n\nUSER is: @%s", user_name);
-	printf("\n");
-	sleep(1);
-	clear();
+    clear();
+    printf("\n\n\n\n******************"
+           "************************");
+    printf("\n\n\n\t****MY SHELL****");
+    printf("\n\n\t-USE AT YOUR OWN RISK-");
+    printf("\n\n\n\n*******************"
+           "***********************");
+    char* user_name = getenv("USER");
+    printf("\n\n\nUSER is: @%s", user_name);
+    printf("\n");
+    sleep(1);
+    clear();
 }
 
 // Function to take input
 int take_input(char* str)
 {
-	char* buf;
-	buf = readline("\n>>> ");
-	if (strlen(buf) != 0) {
-		add_history(buf);
-		strcpy(str, buf);
-		return 0;
-	} 
+    char* buf;
+    buf = readline("\n>>> ");
+    if (strlen(buf) != 0) {
+        add_history(buf);
+        strcpy(str, buf);
+        return 0;
+    }
     else
-		return 1;
+        return 1;
 }
 
 // Function to print Current Directory.
 void print_directory()
 {
-	char cwd[1024];
-	getcwd(cwd, sizeof(cwd));
-	printf("\nDir: %s", cwd);
+    char cwd[1024];
+    getcwd(cwd, sizeof(cwd));
+    printf("\nDir: %s", cwd);
 }
 
 // Function to execute builtin commands
@@ -328,81 +360,81 @@ int our_command_handler(char** parsed)
 void exec_args(char** parsed, int exec_flag)
 {
     get_path();
-	// Forking a child
-	pid_t pid = fork();
+    // Forking a child
+    pid_t pid = fork();
 
-	if (pid == -1) {
-		printf("\nFailed forking child..");
-		return;
-	}
-	else if (pid == 0 && exec_flag == 0) {
-        our_command_handler(parsed);
-	}
-    else if (pid == 0) {
-    if (execvp(parsed[0], parsed) < 0) {
-        printf("\nCould not execute command..");
+    if (pid == -1) {
+        printf("\nFailed forking child..");
+        return;
     }
-    exit(0);
-	} else {
-		// waiting for child to terminate
-		wait(NULL);
-		return;
-	}
+    else if (pid == 0 && exec_flag == 0) {
+        our_command_handler(parsed);
+    }
+    else if (pid == 0) {
+        if (execvp(parsed[0], parsed) < 0) {
+            printf("\nCould not execute command..");
+        }
+        exit(0);
+    } else {
+        // waiting for child to terminate
+        wait(NULL);
+        return;
+    }
 }
 
 // Function where the piped system commands is executed
 void exec_args_piped(char** parsed, char** parsed_pipe)
 {
-	// 0 is read end, 1 is write end
-	int pipe_function[2];
-	pid_t p1, p2;
+    // 0 is read end, 1 is write end
+    int pipe_function[2];
+    pid_t p1, p2;
 
-	if (pipe(pipe_function) < 0) {
-		printf("\nPipe could not be initialized");
-		return;
-	}
-	p1 = fork();
-	if (p1 < 0) {
-		printf("\nCould not fork");
-		return;
-	}
+    if (pipe(pipe_function) < 0) {
+        printf("\nPipe could not be initialized");
+        return;
+    }
+    p1 = fork();
+    if (p1 < 0) {
+        printf("\nCould not fork");
+        return;
+    }
 
-	if (p1 == 0) {
-		// Child 1 executing..
-		// It only needs to write at the write end
-		close(pipe_function[0]);
-		dup2(pipe_function[1], STDOUT_FILENO);
-		close(pipe_function[1]);
+    if (p1 == 0) {
+        // Child 1 executing..
+        // It only needs to write at the write end
+        close(pipe_function[0]);
+        dup2(pipe_function[1], STDOUT_FILENO);
+        close(pipe_function[1]);
 
-		if (execvp(parsed[0], parsed) < 0) {
-			printf("\nCould not execute command 1..");
-			exit(0);
-		}
-	} else {
-		// Parent executing
-		p2 = fork();
+        if (execvp(parsed[0], parsed) < 0) {
+            printf("\nCould not execute command 1..");
+            exit(0);
+        }
+    } else {
+        // Parent executing
+        p2 = fork();
 
-		if (p2 < 0) {
-			printf("\nCould not fork");
-			return;
-		}
+        if (p2 < 0) {
+            printf("\nCould not fork");
+            return;
+        }
 
-		// Child 2 executing..
-		// It only needs to read at the read end
-		if (p2 == 0) {
-			close(pipe_function[1]);
-			dup2(pipe_function[0], STDIN_FILENO);
-			close(pipe_function[0]);
-			if (execvp(parsed_pipe[0], parsed_pipe) < 0) {
-				printf("\nCould not execute command 2..");
-				exit(0);
-			}
-		} else {
-			// parent executing, waiting for two children
-			wait(NULL);
-			wait(NULL);
-		}
-	}
+        // Child 2 executing..
+        // It only needs to read at the read end
+        if (p2 == 0) {
+            close(pipe_function[1]);
+            dup2(pipe_function[0], STDIN_FILENO);
+            close(pipe_function[0]);
+            if (execvp(parsed_pipe[0], parsed_pipe) < 0) {
+                printf("\nCould not execute command 2..");
+                exit(0);
+            }
+        } else {
+            // parent executing, waiting for two children
+            wait(NULL);
+            wait(NULL);
+        }
+    }
 }
 
 int is_our_command(char** parsed) {
@@ -432,50 +464,50 @@ int is_our_command(char** parsed) {
 // function for finding pipe
 int parse_pipe(char* str, char** str_piped)
 {
-	int i;
-	for (i = 0; i < 2; i++) {
+    int i;
+    for (i = 0; i < 2; i++) {
         str_piped[i] = strsep(&str, "|");
-		if (str_piped[i] == NULL)
-			break;
-	}
+        if (str_piped[i] == NULL)
+            break;
+    }
 
-	if (str_piped[1] == NULL)
-		return 0; // returns zero if no pipe is found.
-	else
-		return 1;
+    if (str_piped[1] == NULL)
+        return 0; // returns zero if no pipe is found.
+    else
+        return 1;
 }
 
 // function for parsing command words
 void parse_space(char* str, char** parsed)
 {
-	for (int i = 0; i < MAX_LIST; i++) {
-		parsed[i] = strsep(&str, " ");
-		if (parsed[i] == NULL)
+    for (int i = 0; i < MAX_LIST; i++) {
+        parsed[i] = strsep(&str, " ");
+        if (parsed[i] == NULL)
             return;
-		if (strlen(parsed[i]) == 0)
-			i--;
-	}
+        if (strlen(parsed[i]) == 0)
+            i--;
+    }
     return;
 }
 
 int processString(char* str, char** parsed, char** parsed_pipe)
 {
-	char* str_piped[2];
-	int piped = 0;
+    char* str_piped[2];
+    int piped = 0;
 
-	piped = parse_pipe(str, str_piped);
+    piped = parse_pipe(str, str_piped);
 
-	if (piped) {
-		parse_space(str_piped[0], parsed);
+    if (piped) {
+        parse_space(str_piped[0], parsed);
         parse_space(str_piped[1], parsed_pipe);
-	} 
+    }
     else
         parse_space(str, parsed);
 
-	if (is_our_command(parsed))
-		return 0;
-	else
-		return 1 + piped;
+    if (is_our_command(parsed))
+        return 0;
+    else
+        return 1 + piped;
 }
 
 int main()
