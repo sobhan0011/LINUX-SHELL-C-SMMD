@@ -1,4 +1,4 @@
-// C Program to design a shell in Linux
+// Linux Shell
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -15,7 +15,7 @@
 // Clearing the shell using escape sequences
 #define clear() printf("\033[H\033[J")
 
-// Functions:
+
 void first_segment_of_lines_of_file(const char* file_address) {
     FILE* ptr;
     char* line = NULL;
@@ -54,8 +54,7 @@ void first_segment_of_lines_of_file(const char* file_address) {
     fclose(ptr);
 }
 
-// Following function extracts characters present in `src`
-// between `m` and `n` (excluding `n`)
+// Extracts characters present in `src` between `m` and `n` (excluding `n`)
 char* substr(const char *src, int m, int n)
 {
     // get the length of the destination string
@@ -358,7 +357,7 @@ int our_command_handler(char** parsed)
 // For command execution
 void exec_args(char** parsed, int exec_flag)
 {
-    get_path();
+    //get_path();
     // Forking a child
     pid_t pid = fork();
 
@@ -384,6 +383,7 @@ void exec_args(char** parsed, int exec_flag)
 // For piped commands executing
 void exec_args_piped(char** parsed, char** parsed_pipe)
 {
+    //get_path();
     // 0 for read end
     // 1 for write end
     int pipe_function[2];
@@ -519,12 +519,21 @@ void add_to_history_file(char* str) {
     fclose(ptr);
 }
 
+void sigintHandler(int sig_num)
+{
+	signal(SIGINT, sigintHandler);
+	printf("\n Cannot be terminated using Ctrl+C \n");
+	fflush(stdout);
+}
+
 int main()
 {
     char input_string[MAX_COM], *parsed_args[MAX_LIST];
     char* parsed_args_piped[MAX_LIST];
     int exec_flag = 0;
     init_shell();
+    
+    signal(SIGINT, sigintHandler);
 
     while (1) {
         print_directory();
