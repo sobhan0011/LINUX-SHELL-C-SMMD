@@ -23,16 +23,16 @@ void first_segment_of_lines_of_file(const char* file_address) {
     ssize_t read;
     char ch;
     int sw = 0;
- 
+
     ptr = fopen(file_address, "r");
- 
+
     if (NULL == ptr)
     {
-    	fprintf(stderr, "file can't be opened \n");
+        fprintf(stderr, "file can't be opened \n");
         fclose(ptr);
         return;
-	}
- 	printf("Here are the first segment of lines in your file:\n");
+    }
+    printf("Here are the first segment of lines in your file:\n");
 
     while ((read = getline(&line, &len, ptr)) != -1) {
         sw = 0;
@@ -123,7 +123,7 @@ void most_repeated_word_in_file(const char* file_address) {
             index = j;
         }
     printf("%s", words[index]);
-	fclose(ptr);
+    fclose(ptr);
 }
 
 void space_delete(const char* file_address) {
@@ -139,12 +139,12 @@ void space_delete(const char* file_address) {
         fclose(ptr);
         return;
     }
-    
+
     printf("Here is your file without any white spaces:\n");
     while ((read = getline(&line, &len, ptr)) != -1)
-       for (i = 0; i < read; i++)
-           if (line[i] != ' ' && line[i] != '\n' && line[i] != '\t')
-		   		printf("%c", line[i]);
+        for (i = 0; i < read; i++)
+            if (line[i] != ' ' && line[i] != '\n' && line[i] != '\t')
+                printf("%c", line[i]);
     fclose(ptr);
 }
 
@@ -163,17 +163,17 @@ void none_comment_lines(const char* file_address) {
         return;
     }
 
-	printf("Here are none comment lines of your file:/n");
+    printf("Here are none comment lines of your file:/n");
     while ((read = getline(&line, &len, ptr)) != -1) {
-    sw = 0;
-       for (i = 0; i < read && sw == 0; i++) {
-           if (line[i] != ' ')
-           {
-               sw = 1;
-               break;
-           }
-       }
-       if (sw == 1 && line[i] != '#')
+        sw = 0;
+        for (i = 0; i < read && sw == 0; i++) {
+            if (line[i] != ' ')
+            {
+                sw = 1;
+                break;
+            }
+        }
+        if (sw == 1 && line[i] != '#')
             printf("%s", line);
     }
 
@@ -194,10 +194,10 @@ void number_of_lines_of_file(const char* file_address) {
     ssize_t read;
     int i = 0;
     while ((read = getline(&line, &len, ptr)) != -1)
-       i++;
+        i++;
     printf("Your file has %d line(s).", i);
     fclose(ptr);
-} 
+}
 
 void first_ten_lines_of_file(const char* file_address) {
     FILE* ptr;
@@ -219,12 +219,12 @@ void first_ten_lines_of_file(const char* file_address) {
 }
 
 void get_path() {
-   char cwd[PATH_MAX];
-   if (getcwd(cwd, sizeof(cwd)) != NULL) {
-       printf("Current working dir: %s\n", cwd);
-   } else {
-       perror("getcwd() error");
-   }
+    char cwd[PATH_MAX];
+    if (getcwd(cwd, sizeof(cwd)) != NULL) {
+        printf("Current working dir: %s\n", cwd);
+    } else {
+        perror("getcwd() error");
+    }
 }
 
 // Help command builtin
@@ -512,28 +512,28 @@ int processString(char* str, char** parsed, char** parsed_pipe)
 
 int main()
 {
-	char input_string[MAX_COM], *parsed_args[MAX_LIST];
-	char* parsed_args_piped[MAX_LIST];
-	int exec_flag = 0;
-	init_shell();
+    char input_string[MAX_COM], *parsed_args[MAX_LIST];
+    char* parsed_args_piped[MAX_LIST];
+    int exec_flag = 0;
+    init_shell();
 
-	while (1) {
+    while (1) {
         print_directory();
 
-		if (take_input(input_string))
-			continue;
+        if (take_input(input_string))
+            continue;
 
         exec_flag = processString(input_string, parsed_args, parsed_args_piped);
-		// execflag returns zero if there is no command
-		// or it is a builtin command,
-		// 1 if it is a simple command
-		// 2 if it is including a pipe.
+        // execflag returns zero if there is no command
+        // or it is a builtin command,
+        // 1 if it is a simple command
+        // 2 if it is including a pipe.
 
-		// execute
+        // execute
         if (exec_flag == 2)
             exec_args_piped(parsed_args, parsed_args_piped);
         else
-			exec_args(parsed_args, exec_flag);
-	}
-	return 0;
+            exec_args(parsed_args, exec_flag);
+    }
+    return 0;
 }
